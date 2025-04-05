@@ -1,0 +1,11 @@
+Copyright © 2025 Borgar Flaen Stensrud. All rights reserved.
+
+This software, SpriteToJSON, and all associated source code, images, graphics, and designs are the intellectual property of Borga.
+
+Unauthorized copying, reproduction, distribution, modification, reverse engineering, or use of this software or its components is strictly prohibited without explicit written permission from the author.
+
+This software is provided for personal use and development purposes only. Commercial use is not allowed without a commercial license granted by the author.
+
+If you wish to license, collaborate, or use this software in any public or commercial capacity, please contact the author for explicit permission.
+
+All rights reserved.
