@@ -14,7 +14,16 @@ class GUIManager:
         self.zoom_level = 1.0
         self.root = root
         self.app_logic = app_logic
+        self.on_add_file = self.app_logic.on_add_file
+
         self.root.title("SpriteToJSON Tool")
+
+        self._create_main_layout()
+
+        style = ttk.Style()
+        style.configure("FileBar.TFrame", background="#3a3a3a")
+        style.configure("FileLabel.TLabel", background="#3a3a3a", foreground="white", padding=10)
+        style.configure("AddButton.TButton", padding=10)
 
         self._setup_window()
         self._create_menu()
@@ -31,6 +40,18 @@ class GUIManager:
     def _create_main_layout(self):
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.pack(fill="both", expand=True)
+        # Top layout container
+
+        self.layout_frame = ttk.Frame(self.main_frame)
+        self.layout_frame.pack(fill="both", expand=True)
+
+        # FILE BAR just below menubar
+        self._create_working_file_bar(self.layout_frame)
+
+        # Main content below file bar
+        self.main_frame = ttk.Frame(self.layout_frame)
+        self.main_frame.pack(fill="both", expand=True)
+
 
         # LEFT: Toolbar / Menu
         self.left_menu = LeftMenu(
@@ -224,3 +245,34 @@ class GUIManager:
             self.generate_preview()
 
 
+    def _create_working_file_bar(self, parent):
+        from tkinter import ttk
+
+        # Container frame for working files
+        file_bar_container = ttk.Frame(parent, style="FileBar.TFrame")
+        file_bar_container.pack(side="top", fill="x")
+
+        # Scrollable canvas
+        self.file_canvas = tk.Canvas(file_bar_container, height=40, bg="#3a3a3a", highlightthickness=0)
+        self.file_canvas.pack(side="left", fill="both", expand=True)
+
+        self.scroll_frame = ttk.Frame(self.file_canvas, style="FileBar.TFrame")
+        self.scroll_window = self.file_canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
+
+        # Add scrollbar (hidden by default)
+        self.file_scrollbar = ttk.Scrollbar(file_bar_container, orient="horizontal", command=self.file_canvas.xview)
+        self.file_canvas.configure(xscrollcommand=self.file_scrollbar.set)
+
+        # Bind scroll visibility on hover
+        self.file_canvas.bind("<Enter>", lambda e: self.file_scrollbar.pack(side="bottom", fill="x"))
+        self.file_canvas.bind("<Leave>", lambda e: self.file_scrollbar.pack_forget())
+
+        # Populate with example files
+        for i in range(1, 12):
+            ttk.Label(self.scroll_frame, text=f"file_{i}.stj", style="FileLabel.TLabel").pack(side="left", padx=(6, 0))
+
+        # + Add new button
+        ttk.Button(self.scroll_frame, text="+", style="AddButton.TButton", command=self.on_add_file).pack(side="left", padx=10)
+
+        # Update scrollregion
+        self.scroll_frame.bind("<Configure>", lambda e: self.file_canvas.configure(scrollregion=self.file_canvas.bbox("all")))

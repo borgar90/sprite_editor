@@ -24,6 +24,7 @@ class AppLogic:
         self.on_json_export = None
         self.tool_mode = ""
 
+
     # --- Logic Actions ---
 
     def load_image(self, path):
@@ -104,3 +105,5 @@ class AppLogic:
     def close_project(self):
         print("❌ Close project triggered")
 
+    def on_add_file(self):
+        print("+ add file triggered")

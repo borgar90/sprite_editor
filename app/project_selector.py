@@ -81,26 +81,25 @@ class ProjectSelector:
 
     def input_name(self):
         # --- Ny popup for prosjektnavn ---
-        name_popup = tk.Toplevel(self.root)
-        name_popup.title("Prosjektnavn")
-        name_popup.configure(bg="#1e1e2e")
-        name_popup.resizable(False, False)
+        self.name_popup = tk.Toplevel(self.root)
+        self.name_popup.title("Prosjektnavn")
+        self.name_popup.configure(bg="#1e1e2e")
+        self.name_popup.resizable(False, False)
 
         # Midtstill popup
-        name_popup.update_idletasks()
+        self.name_popup.update_idletasks()
         width, height = 360, 140
-        x = (name_popup.winfo_screenwidth() - width) // 2
-        y = (name_popup.winfo_screenheight() - height) // 2
-        name_popup.geometry(f"{width}x{height}+{x}+{y}")
+        x = (self.name_popup.winfo_screenwidth() - width) // 2
+        y = (self.name_popup.winfo_screenheight() - height) // 2
+        self.name_popup.geometry(f"{width}x{height}+{x}+{y}")
 
-        tk.Label(name_popup, text="Navn på prosjekt:", bg="#1e1e2e", fg="white", font=("Arial", 12)).pack(pady=(20, 5))
-        name_entry = tk.Entry(name_popup, font=("Arial", 12), width=28)
-        name_entry.pack(pady=5)
-        name_entry.focus()
+        tk.Label(self.name_popup, text="Navn på prosjekt:", bg="#1e1e2e", fg="white", font=("Arial", 12)).pack(pady=(20, 5))
+        tk.Entry(self.name_popup, textvariable=self.name_entry, font=("Arial", 12), width=28).pack(pady=5)
 
-        tk.Button(name_popup, text="Opprett", command=self.submit_name).pack(pady=(10, 5))
 
-        name_popup.transient(self.root)
-        name_popup.grab_set()
+        tk.Button(self.name_popup, text="Opprett", command=self.submit_name).pack(pady=(10, 5))
+
+        self.name_popup.transient(self.root)
+        self.name_popup.grab_set()
 
 

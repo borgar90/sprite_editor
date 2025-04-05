@@ -39,6 +39,11 @@ def on_project_selected(root, project_data):
 
 def after_splash(root):
     # ✅ IKKE deiconify root her!
+
+    def on_project_selected(project_data):
+        if project_data:
+            launch_gui(root, project_data)  # <- dette skal ha med data
+
     ProjectSelector(root, on_project_selected)
 
 def main():
@@ -47,7 +52,7 @@ def main():
 
     if SKIP_SPLASH:
         print("[DEV] Skipping splash screen...")
-        after_splash()
+        after_splash(root)
     else:
         SplashScreen(root, after_splash)
 
