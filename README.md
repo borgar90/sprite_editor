@@ -3,7 +3,7 @@
 ![Status](https://img.shields.io/badge/status-in_development-orange)
 ![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macOS-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-green)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
 
 **SpriteToJSON** is a powerful, modern visual toolkit for game developers, pixel artists, and technical designers to slice, preview, organize and export sprite sheets or tilemaps with ease — visually and efficiently.
 
