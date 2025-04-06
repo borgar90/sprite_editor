@@ -84,7 +84,7 @@ class SplashScreen(BaseScreen):
         Called after splash finishes — triggers registered callback and hides splash.
         """
         self.window.withdraw()  # Hide the splash screen window
-        self.app_context.root.deiconify()  # Show the main window (root window)
+        self.app_context.app_state.set_state("project")
 
         if self._callback:
             self._callback()  # Proceed with callback (transition to the next screen)

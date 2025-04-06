@@ -18,7 +18,7 @@ class ProjectTileElement(BaseElement):
     Calls a provided callback when selected.
     """
 
-    def __init__(self, master, title, img_path, data, on_select, **kwargs):
+    def __init__(self, master, title,  data, on_select, **kwargs):
         """
         Initialize the project tile.
 
@@ -31,7 +31,6 @@ class ProjectTileElement(BaseElement):
         """
         super().__init__(master, **kwargs)
         self.title = title
-        self.img_path = img_path
         self.data = data
         self.on_select = on_select
         self.selected = False
@@ -44,11 +43,7 @@ class ProjectTileElement(BaseElement):
         self.widget = tk.Frame(self.master, bg="#2e2e2e", bd=2, relief="solid")
         self.widget.pack(padx=20, pady=10, fill="x")
 
-        img = Image.open(self.img_path).resize((100, 100))
-        self.photo = ImageTk.PhotoImage(img)
-        label_img = tk.Label(self.widget, image=self.photo, bg="#2e2e2e")
-        label_img.image = self.photo
-        label_img.pack(side="left", padx=10, pady=10)
+
 
         label_title = tk.Label(
             self.widget, text=self.title, fg="white", bg="#2e2e2e", font=("Arial", 14)
@@ -56,7 +51,7 @@ class ProjectTileElement(BaseElement):
         label_title.pack(side="left", padx=10)
 
         # Bind click for entire frame and content
-        for widget in (self.widget, label_img, label_title):
+        for widget in (self.widget,  label_title):
             widget.bind("<Button-1>", lambda e: self.select())
 
     def select(self):

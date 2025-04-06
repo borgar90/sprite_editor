@@ -6,66 +6,49 @@ Version: 2.0.0
 This module defines the ProjectScreen class using the new reusable layout/section/element architecture.
 It composes a vertical layout with a top logo, scrollable project list section, and a create button section.
 """
-
 import os
 import tkinter as tk
 from view.screens.base_screen import BaseScreen
-from view.layouts.vertical_scroll_layout import VerticalScrollLayout
-from view.sections.project_list_section import ProjectListSection
-from view.sections.create_button_section import CreateButtonSection
+from view.layouts.project_manager_layout import ProjectManagerLayout
 
 
-class ProjectScreen(BaseScreen):
+class ProjectScreen(BaseScreen, tk.Frame):
     """
-    Project selection screen composed from reusable sections and layout.
+    Project selection screen that allows the user to select or create a project.
+    It now uses a frame to be a valid Tkinter widget.
     """
 
-    def __init__(self, app_context):
+    def __init__(self, app_context, master=None):
+        """
+        Initialize the project screen with app context and Tkinter master.
+
+        :param app_context: Application context holding the shared state
+        :param master: The Tkinter parent widget (usually the root or main window)
+        """
         super().__init__(app_context)
-        self.project_data = []
+        tk.Frame.__init__(self, master)  # Initialize as a Tkinter Frame
+        self.master = master
+        self.app_context = app_context
+        self.layout = None
+        self.find_project = self._find_project
+        self.create_project = self._create_project
+        self.select_project = self._select_project
+        self.render()
 
-    def render(self, root):
-        self._load_projects()
-        self.layout = VerticalScrollLayout(root)
+    def render(self):
+        """
+        Render the project selection UI layout.
+        """
+        # Layout that will hold the project list and the button sections
+        self.layout = ProjectManagerLayout(self)
 
-        # Logo (not a section, placed inline)
-        logo = tk.Label(root, text="SpriteToJSON", font=("Arial", 32), fg="white", bg="black")
-        logo.pack(pady=(30, 10))
-
-        list_section = ProjectListSection(
-            name="ProjectList",
-            project_data=self.project_data,
-            on_select=self._select_project,
-            on_find=self._find_project
-        )
-
-        create_section = CreateButtonSection(
-            name="CreateButton",
-            on_create=self._create_project
-        )
-
-        self.layout.add_section(list_section)
-        self.layout.add_section(create_section)
+        # Render the layout (which handles sections like project list, buttons, etc.)
         self.layout.render()
 
-    def _load_projects(self):
-        """
-        Load all available projects from /projects with preview.png.
-        """
-        folder = "projects"
-        if not os.path.exists(folder):
-            return
+        self.pack(fill="both", expand=True)  # Ensure this frame fills its parent
 
-        for name in os.listdir(folder):
-            path = os.path.join(folder, name)
-            if os.path.isdir(path):
-                preview = os.path.join(path, "preview.png")
-                if os.path.exists(preview):
-                    self.project_data.append({
-                        "title": name,
-                        "img_path": preview,
-                        "path": path
-                    })
+
+
 
     def _select_project(self, project_data):
         """
@@ -73,8 +56,16 @@ class ProjectScreen(BaseScreen):
         """
         self.app_context.selected_project = project_data
 
-    def _find_project(self):
-        print("[ProjectScreen] Find project clicked")
+
 
     def _create_project(self):
         self.app_context.controller.project.create_new_project()
+
+
+    def _find_project(self, project_data):
+        project = self.app_context.selected_project
+        if project is None:
+            print(f"Project {project_data} not found.")
+            return
+
+        self.app_context.selected_project = project

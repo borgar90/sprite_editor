@@ -1,12 +1,3 @@
-"""
-Author: Borgar Flaen Stensrud
-Date: 2025-04-06
-Version: 1.0.0
-
-This module defines the ProjectListSection class, which displays all available project tiles
-alongside a FindProjectTileElement, inside a scrollable container.
-"""
-
 import tkinter as tk
 from view.sections.base_section import BaseSection
 from view.elements.project_tile_element import ProjectTileElement
@@ -33,22 +24,14 @@ class ProjectListSection(BaseSection):
         self.on_find = on_find
         self.selected_tile = None
 
-    def render(self, parent, **options):
-        self.frame = tk.Frame(parent, bg="white", bd=2, relief="solid")
-        self.frame.pack(**options, fill="both", expand=True)
+    def render(self, parent):
+        """
+        Render the project tiles and find-project tile into the parent container.
+        """
+        scrollable = tk.Frame(parent)
+        scrollable.pack(fill="both", expand=True)
 
-        canvas = tk.Canvas(self.frame, bg="#1e1e1e", highlightthickness=0)
-        scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=canvas.yview)
-        scrollable = tk.Frame(canvas, bg="#1e1e1e")
-
-        scrollable.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=scrollable, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-        # Add project tiles
+        # Add project tiles if there are any
         if self.project_data:
             for proj in self.project_data:
                 tile = ProjectTileElement(
@@ -63,12 +46,15 @@ class ProjectListSection(BaseSection):
         else:
             self._add_find_only(scrollable)
 
-        # Always add find-project tile at end
+        # Always add the "find project" tile at the end
         find_tile = FindProjectTileElement(scrollable, on_click=self.on_find)
         find_tile.render()
         self.elements.append(find_tile)
 
     def _handle_select(self, selected_element):
+        """
+        Handles the selection of a project tile.
+        """
         if self.selected_tile:
             self.selected_tile.set_selected(False)
         self.selected_tile = selected_element
@@ -76,6 +62,9 @@ class ProjectListSection(BaseSection):
         self.on_select(self.selected_tile.data)
 
     def _add_find_only(self, parent):
+        """
+        Adds the find-project tile when no projects are available.
+        """
         placeholder = FindProjectTileElement(parent, on_click=self.on_find)
         placeholder.render()
         self.elements.append(placeholder)

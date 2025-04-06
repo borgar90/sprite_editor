@@ -9,6 +9,7 @@ Hands off setup responsibility to Controller to enforce MVC boundaries.
 
 import tkinter as tk
 from controller.controller import Controller
+from init import INITApp
 from model.model import Model  # Make sure the model is imported first
 
 
@@ -35,12 +36,16 @@ def start_app():
 
     # 2. Initialize the app context and model first
     app = AppContext()
+    INITApp(app)
     app.model = Model()  # Initialize the model before the controller and view
 
     # 3. Initialize the controller, which will also set up the view
     app.controller = Controller(app, root)
 
     app.root = root
+
+
+
     # 4. Controller initializes view/model internally, and launches splash
     app.controller.start()
 

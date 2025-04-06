@@ -9,6 +9,7 @@ Controller handles app logic, triggering the appropriate screens.
 from view.view import View
 from controller.project.project_controller import ProjectController
 from model.model import Model
+from controller.app_state import AppState
 
 class Controller:
     """
@@ -24,16 +25,30 @@ class Controller:
         self.project_controller = ProjectController(self)
         self.app_context.controller = self  # Inject the controller into app context
 
+
+        # Initialize AppState
+        self.app_state = AppState()
+        self.app_context.app_state = self.app_state
+
+        # Add listener to handle state changes
+        self.app_state.add_listener(self.handle_state_change)
+
     def start(self):
         """
         Starts the application by showing the splash screen.
         """
         # Start with the splash screen only
-        self.view.show_screen("SplashScreen")
-        splash_screen = self.app_context.view.screen_manager.get_screen("SplashScreen")
+        self.app_context.app_state.set_state("splash")
 
-        # Set the callback for when the splash screen animation is complete
-        splash_screen.schedule_complete_callback(self._on_splash_complete)
+    def handle_state_change(self, new_state):
+        """
+        Handles the change in app state, triggering screen transitions.
+        """
+        if new_state == "splash":
+            self.view.show_screen("SplashScreen")
+        elif new_state == "project":
+            self.view.app_context.root.deiconify()
+            self.view.show_screen("ProjectScreen")
 
     def _on_splash_complete(self):
         """
