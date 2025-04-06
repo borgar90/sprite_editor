@@ -7,6 +7,11 @@ from app.painter_canvas import PainterCanvas
 from app.palette_panel import PalettePanel
 from app.left_menu import LeftMenu
 from app.right_panel import RightPanel
+from tkinter import ttk
+from app.file_tabs_manager import FileTabsManager
+from app.gui_elements.screen_manager import ScreenManager
+from app.gui_elements.palette_popup import PalettePopup
+from app.gui_elements.preview_renderer import PreviewRenderer
 
 
 class GUIManager:
@@ -27,6 +32,9 @@ class GUIManager:
 
         self._setup_window()
         self._create_menu()
+        self.file_tabs = FileTabsManager(self.root, on_close_callback=self._on_file_closed)
+        self.file_tabs.set_on_switch_callback(self._on_tab_switched)
+
         self._create_main_layout()
 
     def _setup_window(self):
@@ -38,6 +46,17 @@ class GUIManager:
         self.root.config(menu=self.menu_bar.menu)
 
     def _create_main_layout(self):
+        self.screen_manager = ScreenManager(self.root, self.app_logic, self.mode_label)
+        self.paint_container, self.preview_container = self.screen_manager.init_widgets(self.main_frame)
+
+        self.palette_popup = PalettePopup(self.root, self.app_logic, self._on_tile_selected)
+        self.preview_renderer = PreviewRenderer(
+            self.root, self.app_logic,
+            self.preview_canvas, self.grid_container,
+            self.grid_window, lambda: self.zoom_level
+        )
+
+
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.pack(fill="both", expand=True)
         # Top layout container
@@ -246,7 +265,13 @@ class GUIManager:
 
 
     def _create_working_file_bar(self, parent):
-        from tkinter import ttk
+        self.tab_control = ttk.Notebook(self.root)
+        self.tab_control.pack(side="top", fill="x")
+
+        # Load existing project files here (if any)
+        self.open_tabs = []
+
+        self._add_new_file_tab_button()
 
         # Container frame for working files
         file_bar_container = ttk.Frame(parent, style="FileBar.TFrame")
@@ -276,3 +301,35 @@ class GUIManager:
 
         # Update scrollregion
         self.scroll_frame.bind("<Configure>", lambda e: self.file_canvas.configure(scrollregion=self.file_canvas.bbox("all")))
+
+    def _add_new_file_tab_button(self):
+        plus_tab = ttk.Frame(self.tab_control)
+        self.tab_control.add(plus_tab, text="+")
+        self.tab_control.bind("<<NotebookTabChanged>>", self._on_tab_changed)
+
+    def _on_tab_changed(self, event):
+        selected_index = self.tab_control.index("current")
+        if selected_index == self.tab_control.index("end") - 1:  # "+" tab clicked
+            self._create_new_file_tab()
+
+    def _create_new_file_tab(self, filename=None):
+        import uuid
+        file_id = filename if filename else f"untitled_{uuid.uuid4().hex[:4]}.stj"
+        new_tab = ttk.Frame(self.tab_control)
+        self.tab_control.insert("end-1", new_tab, text=file_id)  # Insert before "+"
+        self.open_tabs.append((file_id, new_tab))
+        self.tab_control.select(new_tab)
+
+        # TODO: you could load actual canvas/tools into new_tab here
+
+    def _on_file_closed(self, filename):
+        file_data = self.file_tabs.tabs.get(filename)
+        if file_data:
+            # TODO: Check unsaved changes via Interceptor before removing
+            tab = file_data["frame"]
+            self.file_tabs.notebook.forget(tab)
+            del self.file_tabs.tabs[filename]
+
+    def _on_tab_switched(self, filename):
+        print(f"[GUI] Switched to file: {filename}")
+        # TODO: update right panel, tool settings, canvas etc.

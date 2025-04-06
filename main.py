@@ -1,62 +1,51 @@
-import patch_locale
+"""
+Author: Borgar Flaen Stensrud
+Date: 2025-04-06
+Version: 1.2.0
+
+Main entry point for the Sprite Editor application.
+Hands off setup responsibility to Controller to enforce MVC boundaries.
+"""
+
 import tkinter as tk
-from app.theme import ThemeManager
-from app.splash_screen import SplashScreen
-from app.project_selector import ProjectSelector
-from app.gui_engine import GUIManager
-from app.app_logic import AppLogic
-
-SKIP_SPLASH = False  # Sett True for å skipe splash under dev
-
-def launch_gui(root, project_data):
-    theme = ThemeManager(root)
-    theme.apply_to_root()
-
-    app_logic = AppLogic()
-
-    if project_data["type"] == "new":
-        app_logic.create_new_project(project_data["path"], project_data["name"])
-    else:
-        app_logic.load_project(project_data["path"])
-
-    gui = GUIManager(root, app_logic)
-
-    app_logic.on_preview_refresh = gui.generate_preview
-
-    def on_image_loaded(image):
-        gui.display_image(image)
-        gui.generate_preview()
-
-    app_logic.on_image_loaded = on_image_loaded
-
-    root.deiconify()  # 👈 Her først vises hovedvinduet
-    root.lift()
-
-def on_project_selected(root, project_data):
-    if project_data:
-        launch_gui(root, project_data)
+from controller.controller import Controller
+from model.model import Model  # Make sure the model is imported first
 
 
-def after_splash(root):
-    # ✅ IKKE deiconify root her!
+class AppContext:
+    """
+    Shared dependency context between all major layers.
+    """
+    def __init__(self):
+        self.model = None
+        self.controller = None
+        self.view = None
+        self.selected_project = None
 
-    def on_project_selected(project_data):
-        if project_data:
-            launch_gui(root, project_data)  # <- dette skal ha med data
 
-    ProjectSelector(root, on_project_selected)
-
-def main():
+def start_app():
+    # 1. Initialize the root window for the app
     root = tk.Tk()
+    root.title("Sprite Editor")
+    root.geometry("1280x800")
+    root.configure(bg="black")
 
+    # Initially hide the main window until the splash screen is done
+    root.withdraw()
 
-    if SKIP_SPLASH:
-        print("[DEV] Skipping splash screen...")
-        after_splash(root)
-    else:
-        SplashScreen(root, after_splash)
+    # 2. Initialize the app context and model first
+    app = AppContext()
+    app.model = Model()  # Initialize the model before the controller and view
+
+    # 3. Initialize the controller, which will also set up the view
+    app.controller = Controller(app, root)
+
+    app.root = root
+    # 4. Controller initializes view/model internally, and launches splash
+    app.controller.start()
 
     root.mainloop()
 
+
 if __name__ == "__main__":
-    main()
+    start_app()
