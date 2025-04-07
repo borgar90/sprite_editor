@@ -9,7 +9,7 @@ inside the GUI. It uses a custom PainterCanvas for rendering and user interactio
 
 from abc import ABC
 from view.sections.base_section import BaseSection
-#from view.widgets.painter_canvas import PainterCanvas  # ensure this file exists and contains the canvas class
+from view.painter_canvas import PainterCanvas  # Corrected import path
 
 
 class CanvasSection(BaseSection, ABC):
@@ -25,7 +25,7 @@ class CanvasSection(BaseSection, ABC):
         :param app_logic: Reference to the application's controller or logic layer
         """
         super().__init__(parent, app_logic)
-        #self.canvas = PainterCanvas(self.frame, app_logic)  # Attach PainterCanvas to this section's frame
+        self.canvas = PainterCanvas(self.frame, app_logic)  # Attach PainterCanvas to this section's frame
 
     def get_canvas(self):
         """

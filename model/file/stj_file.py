@@ -1,4 +1,4 @@
-# files/stj_file.py
+# Moved from files/stj_file.py
 import os
 import json
 from base_file import BaseFile

@@ -22,9 +22,9 @@ class Controller:
         self.model = Model()
         app_context.model = self.model
         self.view = View(root, app_context)
-        self.project_controller = ProjectController(self)
+        self.project_controller = ProjectController(self.app_context)
+        self.project = self.project_controller
         self.app_context.controller = self  # Inject the controller into app context
-
 
         # Initialize AppState
         self.app_state = AppState()
@@ -49,6 +49,8 @@ class Controller:
         elif new_state == "project":
             self.view.app_context.root.deiconify()
             self.view.show_screen("ProjectScreen")
+        elif new_state == "default":
+            self.view.show_screen("DefaultScreen")
 
     def _on_splash_complete(self):
         """

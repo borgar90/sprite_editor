@@ -20,42 +20,18 @@ class ProjectModel:
         self.name = "Untitled"
         self.version = "1.0"
         self.project_path = None
-        self.metadata = {}
+        self.metadata = {}  # Initialize metadata as an empty dictionary
 
-    def create(self, name, path):
+    def load_projects(self, file_path):
         """
-        Create a new project.
+        Load project data from a JSON file.
 
-        :param name: Project name
-        :param path: Path to the project folder
+        :param file_path: Path to the JSON file containing project data.
         """
-        self.name = name
-        self.project_path = path
-        self.metadata = {"created": True}
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"The file {file_path} does not exist.")
 
-    def serialize(self):
-        """
-        Return project state as a dictionary for snapshot or save.
-        """
-        return {
-            "name": self.name,
-            "version": self.version,
-            "path": self.project_path,
-            "metadata": self.metadata.copy()
-        }
+        with open(file_path, 'r') as file:
+            self.metadata = json.load(file)
 
-    def load(self, data):
-        """
-        Load project state from serialized dictionary.
-        """
-        self.name = data.get("name", "Untitled")
-        self.version = data.get("version", "1.0")
-        self.project_path = data.get("path", None)
-        self.metadata = data.get("metadata", {})
-
-    def is_corrupt(self):
-        """
-        Determine if project state is corrupted (e.g., missing path).
-        """
-        return not self.project_path or not os.path.isdir(self.project_path)
+        print(f"Loaded projects from {file_path}")

@@ -1,23 +1,32 @@
-# right_panel.py
+"""
+Author: Borgar Flaen Stensrud
+Date: 2025-04-07
+Version: 1.0.0
+
+This module defines RightPanel, which provides a right-side panel for configuring tiles, slice ranges, and grid settings.
+"""
 
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from tkinter import IntVar, BooleanVar
 
 class RightPanel(tb.Frame):
-    def __init__(self, parent, app_logic, refresh_preview):
+    """
+    Provides a right-side panel for configuring tiles, slice ranges, and grid settings.
+    """
+
+    def __init__(self, parent, controller):
         super().__init__(parent, bootstyle="dark")
         self.pack(fill="both", expand=True)
-        self.app_logic = app_logic
-        self.refresh_preview = refresh_preview
+        self.controller = controller
 
         # State vars
-        self.tile_width = IntVar(value=app_logic.tile_width)
-        self.tile_height = IntVar(value=app_logic.tile_height)
+        self.tile_width = IntVar(value=controller.tile_width)
+        self.tile_height = IntVar(value=controller.tile_height)
         self.lock_tile = BooleanVar(value=True)
 
-        self.slice_start = IntVar(value=app_logic.slice_start)
-        self.slice_end = IntVar(value=app_logic.slice_end)
+        self.slice_start = IntVar(value=controller.slice_start)
+        self.slice_end = IntVar(value=controller.slice_end)
 
         self.grid_cols = IntVar(value=16)
         self.grid_rows = IntVar(value=16)
@@ -29,6 +38,7 @@ class RightPanel(tb.Frame):
         self._create_collapsible_section("🧮 Painter Grid", self._grid_ui)
 
     def _create_collapsible_section(self, title, build_content):
+        """Creates a collapsible section in the panel."""
         section = tb.Labelframe(self, text=title, bootstyle="info", padding=10)
         section.pack(fill="x", padx=8, pady=6)
 
@@ -51,6 +61,7 @@ class RightPanel(tb.Frame):
         build_content(content)
 
     def _tile_ui(self, parent):
+        """Builds the tile configuration UI."""
         row = tb.Frame(parent)
         row.pack(fill="x", pady=4)
         tb.Label(row, text="Width:").pack(side=LEFT)
@@ -60,6 +71,7 @@ class RightPanel(tb.Frame):
         tb.Checkbutton(parent, text="Lock dimensions", variable=self.lock_tile, bootstyle="success-round-toggle").pack(anchor="w", pady=4)
 
     def _slice_ui(self, parent):
+        """Builds the slice range configuration UI."""
         row = tb.Frame(parent)
         row.pack(fill="x", pady=4)
         tb.Label(row, text="Start:").pack(side=LEFT)
@@ -68,6 +80,7 @@ class RightPanel(tb.Frame):
         tb.Entry(row, textvariable=self.slice_end, width=6).pack(side=LEFT, padx=5)
 
     def _grid_ui(self, parent):
+        """Builds the grid configuration UI."""
         row = tb.Frame(parent)
         row.pack(fill="x", pady=4)
         tb.Label(row, text="Cols:").pack(side=LEFT)

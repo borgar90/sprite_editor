@@ -9,6 +9,8 @@ class INITApp:
         self.app_context.projects = []
         self.projects_data_path = "projects.json"
         self.set_logo()
+
+        # Load projects into the app context
         self.load_projects_from_json()
 
     def set_logo(self):

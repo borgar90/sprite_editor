@@ -1,4 +1,4 @@
-# app/interceptors/save_warning_interceptor.py
+# Moved from interceptors/save_warning_interceptor.py
 from tkinter import messagebox
 from interceptor import Interceptor
 

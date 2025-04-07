@@ -18,10 +18,15 @@ class ProjectController:
     Used after splash when transitioning into project selection or main editing.
     """
 
-    def __init__(self, root_controller):
-        self.root = root_controller
-        self.model = root_controller.app_context.model.project
-        self.view = root_controller.app_context.view  # for screen/view access
+    def __init__(self, app_context):
+        self.app_context = app_context
+        self.project_model = app_context.model.project
+        self.project_model.load_projects("projects.json")
+        self.model = self.app_context.model  # Initialize model from app_context
+
+    def get_projects(self):
+        """Fetch projects from the model."""
+        return self.project_model.get_projects()
 
     def create_new_project(self, name=None, path=None):
         """
@@ -46,7 +51,12 @@ class ProjectController:
 
         self.model.create(name, path)
         print(f"[ProjectController] Created new project: {name} at {path}")
-        self.view.show_screen("CoreScreen")
+
+        # Add the new project using INITApp's add_project method
+        self.app_context.init_app.add_project(name, path)
+
+        # Transition to the DefaultScreen
+        self.app_context.controller.handle_state_change("default")
 
     def load_project_from_data(self, data):
         self.model.load(data)

@@ -11,6 +11,9 @@ import tkinter as tk
 from controller.controller import Controller
 from init import INITApp
 from model.model import Model  # Make sure the model is imported first
+from view.screens.default_screen import DefaultScreen
+from view.screens.project_screen import ProjectScreen
+from view.screens.splash_screen import SplashScreen
 
 
 class AppContext:
@@ -24,33 +27,30 @@ class AppContext:
         self.selected_project = None
 
 
-def start_app():
-    # 1. Initialize the root window for the app
-    root = tk.Tk()
-    root.title("Sprite Editor")
-    root.geometry("1280x800")
-    root.configure(bg="black")
+class MainApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Sprite Editor")
+        self.geometry("1280x800")
+        self.container = tk.Frame(self)
+        self.container.pack(side="top", fill="both", expand=True)
 
-    # Initially hide the main window until the splash screen is done
-    root.withdraw()
+        self.frames = {}
+        for F in (SplashScreen, ProjectScreen, DefaultScreen):
+            frame = F(parent=self.container, controller=self)
+            self.frames[F.__name__] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
 
-    # 2. Initialize the app context and model first
-    app = AppContext()
-    INITApp(app)
-    app.model = Model()  # Initialize the model before the controller and view
+        self.show_frame("SplashScreen")
 
-    # 3. Initialize the controller, which will also set up the view
-    app.controller = Controller(app, root)
+    def show_frame(self, page_name):
+        frame = self.frames[page_name]
+        frame.tkraise()
 
-    app.root = root
-
-
-
-    # 4. Controller initializes view/model internally, and launches splash
-    app.controller.start()
-
-    root.mainloop()
+    def start_splash(self):
+        self.after(3000, lambda: self.show_frame("ProjectScreen"))  # Show ProjectScreen after 3 seconds
 
 
 if __name__ == "__main__":
-    start_app()
+    app = MainApp()
+    app.mainloop()
